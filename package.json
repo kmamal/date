@@ -11,5 +11,22 @@
     "test": "./scripts/run-tests.sh",
     "update-exports": "./scripts/update-exports.sh"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@kmamal/testing": "^0.0.20"
+  },
+  "dependencies": {
+    "@kmamal/util": "^0.0.85"
+  },
+  "exports": {
+    "./week": "./src/week.js",
+    "./copy": "./src/copy.js",
+    "./rounding": "./src/rounding.js",
+    "./iso-string": "./src/iso-string.js",
+    "./elapsed": "./src/elapsed.js",
+    "./clone": "./src/clone.js",
+    "./shift": "./src/shift.js",
+    "./date": "./src/date.js",
+    "./duration": "./src/duration.js"
+  }
 }
