@@ -12,7 +12,7 @@ const {
 	floorTo,
 	ceilTo,
 	roundTo,
-} = require('../number/rounding')
+} = require('@kmamal/util/number/rounding')
 
 const {
 	day: dDay,
