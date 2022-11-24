@@ -1,5 +1,6 @@
 const { test } = require('@kmamal/testing')
 const {
+	PARTS,
 	fromTimestamp,
 	calcYear,
 	calcMonth,
@@ -8,11 +9,13 @@ const {
 	calcMinute,
 	calcSecond,
 	calcMillisecond,
-	toTimestamp,
 	calcIsLeapYear,
 	calcDaysInMonth,
+	calcDayOfWeek,
+	toTimestamp,
 } = require('./date')
-const { randInt } = require('../random/rand-int')
+const { randInt } = require('@kmamal/util/random/rand-int')
+const { zip: zipObject } = require('@kmamal/util/object/zip')
 
 const randomMillisecond = () => randInt(0, 1000)
 const randomSecond = () => randInt(0, 60)
@@ -30,20 +33,17 @@ test("date.fromTimestamp", (t) => {
 		const a = fromTimestamp(timestamp)
 
 		const date = new Date(timestamp)
-		const year = date.getUTCFullYear()
-		const isLeapYear = calcIsLeapYear(year)
-		const month = date.getUTCMonth() + 1
 		const b = {
 			timestamp,
-			year,
-			month,
+			year: date.getUTCFullYear(),
+			month: date.getUTCMonth() + 1,
 			day: date.getUTCDate(),
 			hour: date.getUTCHours(),
 			minute: date.getUTCMinutes(),
 			second: date.getUTCSeconds(),
 			millisecond: date.getUTCMilliseconds(),
-			isLeapYear,
-			daysInMonth: calcDaysInMonth(month, isLeapYear),
+			isLeapYear: a.isLeapYear,
+			daysInMonth: a.daysInMonth,
 			dayOfWeek: (6 + date.getUTCDay()) % 7,
 		}
 
@@ -55,6 +55,9 @@ test("date.fromTimestamp", (t) => {
 		t.equal(calcMinute(timestamp), b.minute)
 		t.equal(calcSecond(timestamp), b.second)
 		t.equal(calcMillisecond(timestamp), b.millisecond)
+		t.equal(calcIsLeapYear(timestamp), b.isLeapYear)
+		t.equal(calcDaysInMonth(timestamp), b.daysInMonth)
+		t.equal(calcDayOfWeek(timestamp), b.dayOfWeek)
 	}
 })
 
@@ -89,6 +92,40 @@ test("date.toTimestamp", (t) => {
 			second,
 			millisecond,
 		))
+
+		t.equal(toTimestamp(a), b.getTime(), { a, b })
+	}
+})
+
+test("date.toTimestamp partial", (t) => {
+	for (let i = 0; i < 1e5; i++) {
+		const year = randomYear()
+		const isLeapYear = calcIsLeapYear(year)
+		const month = randomMonth()
+		const daysInMonth = calcDaysInMonth(month, isLeapYear)
+		const day = randomDay(daysInMonth)
+		const hour = randomHour()
+		const minute = randomMinute()
+		const second = randomSecond()
+		const millisecond = randomMillisecond()
+
+		const numParts = randInt(1, PARTS.length + 1)
+
+		const keys = PARTS.slice(0, numParts)
+		const values = [
+			year,
+			month,
+			day,
+			hour,
+			minute,
+			second,
+			millisecond,
+		].slice(0, numParts)
+
+		const a = zipObject(keys, values)
+
+		if (values.length >= 2) { values[1]-- }
+		const b = new Date(Date.UTC(...values))
 
 		t.equal(toTimestamp(a), b.getTime(), { a, b })
 	}

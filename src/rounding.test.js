@@ -31,10 +31,10 @@ const {
 } = require('./rounding')
 const {
 	fromPartial,
-	calcIsLeapYear,
-	calcDaysInMonth,
+	calcIsLeapYearFromYear,
+	calcDaysInMonthFromMonth,
 } = require('./date')
-const { randInt } = require('../random/rand-int')
+const { randInt } = require('@kmamal/util/random/rand-int')
 
 const randomMillisecond = () => randInt(0, 1000)
 const randomSecond = () => randInt(0, 60)
@@ -48,8 +48,8 @@ test("date.rounding.floor", (t) => {
 	for (let i = 0; i < 1e4; i++) {
 		const year = randomYear()
 		const month = randomMonth()
-		const isLeapYear = calcIsLeapYear(year)
-		const daysInMonth = calcDaysInMonth(month, isLeapYear)
+		const isLeapYear = calcIsLeapYearFromYear(year)
+		const daysInMonth = calcDaysInMonthFromMonth(month, isLeapYear)
 		const day = randomDay(daysInMonth)
 		const hour = randomHour()
 		const minute = randomMinute()
@@ -117,8 +117,8 @@ test("date.rounding.ceil", (t) => {
 	for (let i = 0; i < 1e4; i++) {
 		const year = randomYear()
 		const month = randomMonth()
-		const isLeapYear = calcIsLeapYear(year)
-		const daysInMonth = calcDaysInMonth(month, isLeapYear)
+		const isLeapYear = calcIsLeapYearFromYear(year)
+		const daysInMonth = calcDaysInMonthFromMonth(month, isLeapYear)
 		const day = randomDay(daysInMonth)
 		const hour = randomHour()
 		const minute = randomMinute()

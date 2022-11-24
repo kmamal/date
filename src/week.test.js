@@ -5,7 +5,7 @@ const {
 } = require('./week')
 const { DURATION } = require('./duration')
 const { fromPartial } = require('./date')
-const { randInt } = require('../random/rand-int')
+const { randInt } = require('@kmamal/util/random/rand-int')
 
 test("date.calcWeek", (t) => {
 	t.equal(calcWeek(fromPartial({ year: 1977, month: 1, day: 1 })), 53)

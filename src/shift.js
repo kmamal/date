@@ -1,8 +1,8 @@
 const { DURATION } = require('./duration')
 const {
-	calcIsLeapYear,
-	calcDaysInMonth,
-	calcDayOfWeek,
+	calcIsLeapYearFromYear,
+	calcDaysInMonthFromMonth,
+	calcDayOfWeekFromDaysSinceEpoch,
 	calcDaysSinceEpoch,
 	_fromTimestamp,
 	toTimestamp,
@@ -51,12 +51,12 @@ const shiftTimestamp = (t, part, x) => {
 
 const shiftYear$$$ = (date, x) => {
 	date.year += x
-	date.isLeapYear = calcIsLeapYear(date.year)
+	date.isLeapYear = calcIsLeapYearFromYear(date.year)
 	date.timestamp = null
 	date.timestamp = toTimestamp(date)
-	date.daysInMonth = calcDaysInMonth(date.month, date.isLeapYear)
+	date.daysInMonth = calcDaysInMonthFromMonth(date.month, date.isLeapYear)
 	const daysSinceEpoch = calcDaysSinceEpoch(date.timestamp)
-	date.dayOfWeek = calcDayOfWeek(daysSinceEpoch)
+	date.dayOfWeek = calcDayOfWeekFromDaysSinceEpoch(daysSinceEpoch)
 	return date
 }
 
@@ -80,13 +80,12 @@ const shiftMonth$$$ = (date, x) => {
 		_month = 12 + (_month % 12)
 	}
 	date.month = _month + 1
-	date.isLeapYear = calcIsLeapYear(date.year)
+	date.isLeapYear = calcIsLeapYearFromYear(date.year)
 	date.timestamp = null
 	date.timestamp = toTimestamp(date)
-	date.daysInMonth = calcDaysInMonth(date.month, date.isLeapYear)
+	date.daysInMonth = calcDaysInMonthFromMonth(date.month, date.isLeapYear)
 	const daysSinceEpoch = calcDaysSinceEpoch(date.timestamp)
-	date.dayOfWeek = calcDayOfWeek(daysSinceEpoch)
-
+	date.dayOfWeek = calcDayOfWeekFromDaysSinceEpoch(daysSinceEpoch)
 	return date
 }
 

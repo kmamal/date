@@ -16,7 +16,7 @@ const {
 	shift,
 } = require('./shift')
 const { fromTimestamp } = require('./date')
-const { randInt } = require('../random/rand-int')
+const { randInt } = require('@kmamal/util/random/rand-int')
 
 const year3000 = Date.UTC(3000)
 

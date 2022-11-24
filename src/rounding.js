@@ -201,11 +201,6 @@ const floorSecond = (date) => {
 floorSecond.$$$ = floorSecond$$$
 
 const floor$$$ = (date, unit) => {
-	if (false
-		|| unit === 'milliseconds'
-		|| unit === 'millisecond'
-	) { return date }
-
 	switch (unit) {
 		case 'years': case 'year': return floorYear$$$(date)
 		case 'months': case 'month': return floorMonth$$$(date)
@@ -301,11 +296,6 @@ const ceilSecond = (date) => {
 ceilSecond.$$$ = ceilSecond$$$
 
 const ceil$$$ = (date, unit) => {
-	if (false
-		|| unit === 'milliseconds'
-		|| unit === 'millisecond'
-	) { return date }
-
 	switch (unit) {
 		case 'years': case 'year': return ceilYear$$$(date)
 		case 'months': case 'month': return ceilMonth$$$(date)
@@ -401,11 +391,6 @@ const roundSecond = (date) => {
 roundSecond.$$$ = roundSecond$$$
 
 const round$$$ = (date, unit) => {
-	if (false
-		|| unit === 'milliseconds'
-		|| unit === 'millisecond'
-	) { return date }
-
 	switch (unit) {
 		case 'years': case 'year': return roundYear$$$(date)
 		case 'months': case 'month': return roundMonth$$$(date)

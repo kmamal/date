@@ -20,41 +20,44 @@ const PARTS = [
 
 const DAYS_IN_MONTH = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 const DAYS_IN_MONTH_LEAP = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-const DAYS_TO_MONTH = new Array(364)
-{
+
+const _makeDaysToMonth = (dst, src) => {
 	let index = 0
 	for (let i = 0; i < 12; i++) {
-		const numDays = DAYS_IN_MONTH[i]
+		const numDays = src[i]
 		for (let j = 0; j < numDays; j++) {
-			DAYS_TO_MONTH[index++] = i
+			dst[index++] = i
 		}
 	}
+	return dst
 }
-const DAYS_TO_MONTH_LEAP = Array.from(DAYS_TO_MONTH)
-DAYS_TO_MONTH_LEAP.splice(31, 0, 1)
+
+const DAYS_TO_MONTH = _makeDaysToMonth(new Array(364), DAYS_IN_MONTH)
+const DAYS_TO_MONTH_LEAP = _makeDaysToMonth(new Array(365), DAYS_IN_MONTH_LEAP)
+
 const MONTH_START = prefixSums(DAYS_IN_MONTH)
 const MONTH_START_LEAP = prefixSums(DAYS_IN_MONTH_LEAP)
 
 
-const _cachedIsLeapYear = {}
+const _cachedIsLeapYearFromYear = {}
 
-const _doCalcIsLeapYear = (year) => false
+const _doCalcIsLeapYearFromYear = (year) => false
 || year % 400 === 0
 || (true
 	&& year % 4 === 0
 	&& year % 100 !== 0
 )
 
-const calcIsLeapYear = (year) => {
-	const cached = _cachedIsLeapYear[year]
+const calcIsLeapYearFromYear = (year) => {
+	const cached = _cachedIsLeapYearFromYear[year]
 	if (cached !== undefined) { return cached }
-	const res = _doCalcIsLeapYear(year)
-	_cachedIsLeapYear[year] = res
+	const res = _doCalcIsLeapYearFromYear(year)
+	_cachedIsLeapYearFromYear[year] = res
 	return res
 }
 
 
-const calcDaysInMonth = (month, isLeapYear = false) => {
+const calcDaysInMonthFromMonth = (month, isLeapYear = false) => {
 	const days = isLeapYear ? DAYS_IN_MONTH_LEAP : DAYS_IN_MONTH
 	return days[month - 1]
 }
@@ -67,7 +70,7 @@ const _doCalcLeapYearsSinceEpoch = (_year, isLeapYear) => (isLeapYear ? -1 : 0)
 	- Math.floor((_year + 70) / 100)
 	+ Math.floor((_year + 370) / 400)
 
-const _calcLeapYearsSinceEpoch = (_year, isLeapYear) => {
+const calcLeapYearsSinceEpochFromYear = (_year, isLeapYear) => {
 	const cached = _cachedLeapYearSinceEpoch[_year]
 	if (cached !== undefined) { return cached }
 	const res = _doCalcLeapYearsSinceEpoch(_year, isLeapYear)
@@ -83,20 +86,20 @@ const calcHour = (timestamp) => Math.floor((timestamp % dDay) / dHour)
 
 const calcDaysSinceEpoch = (timestamp) => Math.floor(timestamp / dDay)
 
-const calcDayOfWeek = (daysSinceEpoch) => (daysSinceEpoch + 3) % 7
+const calcDayOfWeekFromDaysSinceEpoch = (daysSinceEpoch) => (daysSinceEpoch + 3) % 7
 
 const calcYearFromDaysSinceEpoch = (daysSinceEpoch) => {
 	let _year = Math.floor(daysSinceEpoch / 365)
 	let year = 1970 + _year
-	let isLeapYear = calcIsLeapYear(year)
-	const leapYearsSinceEpoch = _calcLeapYearsSinceEpoch(_year, isLeapYear)
+	let isLeapYear = calcIsLeapYearFromYear(year)
+	const leapYearsSinceEpoch = calcLeapYearsSinceEpochFromYear(_year, isLeapYear)
 
 	let daysSinceYear = daysSinceEpoch - (_year * 365 + leapYearsSinceEpoch)
 	if (daysSinceYear < 0) {
 		_year -= 1
 		year -= 1
 		daysSinceYear += 365
-		isLeapYear = isLeapYear ? false : calcIsLeapYear(year)
+		isLeapYear = isLeapYear ? false : calcIsLeapYearFromYear(year)
 		if (isLeapYear) { daysSinceYear += 1 }
 	}
 
@@ -144,6 +147,24 @@ const calcDay = (timestamp) => {
 }
 
 
+const calcIsLeapYear = (timestamp) => {
+	const year = calcYear(timestamp)
+	return calcIsLeapYearFromYear(year)
+}
+
+const calcDaysInMonth = (timestamp) => {
+	const daysSinceEpoch = calcDaysSinceEpoch(timestamp)
+	const { isLeapYear, daysSinceYear } = calcYearFromDaysSinceEpoch(daysSinceEpoch)
+	const { month } = calcMonthFromDaysSinceYear(daysSinceYear, isLeapYear)
+	return calcDaysInMonthFromMonth(month, isLeapYear)
+}
+
+const calcDayOfWeek = (timestamp) => {
+	const daysSinceEpoch = calcDaysSinceEpoch(timestamp)
+	return calcDayOfWeekFromDaysSinceEpoch(daysSinceEpoch)
+}
+
+
 const _fromTimestamp = (date, timestamp) => {
 	let remaining = timestamp
 
@@ -163,17 +184,19 @@ const _fromTimestamp = (date, timestamp) => {
 	remaining -= hour
 	remaining /= 24
 
+	const daysSinceEpoch = remaining
+
 	const {
 		year,
 		isLeapYear,
 		daysSinceYear,
-	} = calcYearFromDaysSinceEpoch(remaining)
+	} = calcYearFromDaysSinceEpoch(daysSinceEpoch)
 
 	const { month, day } = calcMonthFromDaysSinceYear(daysSinceYear, isLeapYear)
 
-	const daysInMonth = calcDaysInMonth(month, isLeapYear)
+	const daysInMonth = calcDaysInMonthFromMonth(month, isLeapYear)
 
-	const dayOfWeek = calcDayOfWeek(remaining)
+	const dayOfWeek = calcDayOfWeekFromDaysSinceEpoch(daysSinceEpoch)
 
 	date.timestamp = timestamp
 	date.year = year
@@ -202,8 +225,8 @@ const toTimestamp = (date) => {
 	const { year } = date
 	if (year === undefined) { return 0 }
 	const _year = year - 1970
-	const { isLeapYear = calcIsLeapYear(year) } = date
-	timestamp += _year * 365 + _calcLeapYearsSinceEpoch(_year, isLeapYear)
+	const { isLeapYear = calcIsLeapYearFromYear(year) } = date
+	timestamp += _year * 365 + calcLeapYearsSinceEpochFromYear(_year, isLeapYear)
 
 	const { month } = date
 	if (month === undefined) { return timestamp * dDay }
@@ -252,12 +275,17 @@ module.exports = {
 	calcIsLeapYear,
 	calcDaysInMonth,
 	calcDayOfWeek,
-	calcDaysSinceEpoch,
-	calcYearFromDaysSinceEpoch,
-	calcMonthFromDaysSinceYear,
 	_fromTimestamp,
 	fromTimestamp,
 	toTimestamp,
 	_fromPartial,
 	fromPartial,
+	//
+	calcIsLeapYearFromYear,
+	calcDaysInMonthFromMonth,
+	calcDayOfWeekFromDaysSinceEpoch,
+	calcDaysSinceEpoch,
+	calcYearFromDaysSinceEpoch,
+	calcMonthFromDaysSinceYear,
+	calcLeapYearsSinceEpochFromYear,
 }
