@@ -18,14 +18,14 @@
     "@kmamal/testing": "0.0.33"
   },
   "exports": {
-    "./week": "./src/week.js",
-    "./copy": "./src/copy.js",
-    "./rounding": "./src/rounding.js",
     "./iso-string": "./src/iso-string.js",
-    "./elapsed": "./src/elapsed.js",
+    "./rounding": "./src/rounding.js",
     "./clone": "./src/clone.js",
-    "./shift": "./src/shift.js",
     "./date": "./src/date.js",
-    "./duration": "./src/duration.js"
+    "./week": "./src/week.js",
+    "./duration": "./src/duration.js",
+    "./copy": "./src/copy.js",
+    "./elapsed": "./src/elapsed.js",
+    "./shift": "./src/shift.js"
   }
 }
