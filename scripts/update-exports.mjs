@@ -1,11 +1,9 @@
 import Fs from 'node:fs/promises'
 import Path from 'node:path'
-import { fileURLToPath } from 'url'
 
-const rootDir = Path.resolve(Path.dirname(fileURLToPath(import.meta.url)), '..')
+const rootDir = Path.resolve(import.meta.dirname, '..')
 process.chdir(rootDir)
 
-await Fs.copyFile('package.json', 'package.json~')
 const pkg = JSON.parse(await Fs.readFile('package.json', 'utf8'))
 
 pkg.exports = {}
@@ -22,7 +20,8 @@ const recurse = async (dirPath) => {
 			) { continue }
 
 			await recurse(Path.join(dirPath, entry.name))
-		} else {
+		}
+		else {
 			if (false
 				|| !entry.name.endsWith('.js')
 				|| entry.name.endsWith('.test.js')
@@ -30,18 +29,15 @@ const recurse = async (dirPath) => {
 			) { continue }
 
 			const filePath = `./${Path.join(dirPath, entry.name)}`
-			if (filePath === './src/index.js') {
-				pkg.main = filePath
-				continue
-			}
 
-			const key = `./${filePath.endsWith('/index.js')
-				? filePath.slice(6, -9)
-				: filePath.slice(6, -3)}`
+			const key = filePath === './src/index.js' ? '.'
+				: `./${filePath.endsWith('/index.js')
+					? filePath.slice(6, -9)
+					: filePath.slice(6, -3)}`
 			pkg.exports[key] = filePath
 		}
 	}
 }
 
 await recurse('.')
-await Fs.writeFile('package.json', JSON.stringify(pkg, null, 2))
+await Fs.writeFile('package.json', `${JSON.stringify(pkg, null, 2)}\n`)

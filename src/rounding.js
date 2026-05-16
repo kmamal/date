@@ -239,7 +239,7 @@ const ceilMonth$$$ = (date) => {
 	const floored = toTimestamp({ year, month })
 	if (floored !== date.timestamp) {
 		const t = month === 12
-			? toTimestamp({ year: year + 1, month: 0 })
+			? toTimestamp({ year: year + 1, month: 1 })
 			: toTimestamp({ year, month: month + 1 })
 		_fromTimestamp(date, t)
 	}
@@ -334,7 +334,7 @@ const roundMonth$$$ = (date) => {
 	const floored = toTimestamp({ year, month })
 	if (floored === date.timestamp) { return date }
 	const ceiled = month === 12
-		? toTimestamp({ year: year + 1, month: 0 })
+		? toTimestamp({ year: year + 1, month: 1 })
 		: toTimestamp({ year, month: month + 1 })
 	const t = (timestamp - floored) < (ceiled - timestamp) ? floored : ceiled
 	_fromTimestamp(date, t)

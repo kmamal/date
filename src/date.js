@@ -32,8 +32,8 @@ const _makeDaysToMonth = (dst, src) => {
 	return dst
 }
 
-const DAYS_TO_MONTH = _makeDaysToMonth(new Array(364), DAYS_IN_MONTH)
-const DAYS_TO_MONTH_LEAP = _makeDaysToMonth(new Array(365), DAYS_IN_MONTH_LEAP)
+const DAYS_TO_MONTH = _makeDaysToMonth(new Array(365), DAYS_IN_MONTH)
+const DAYS_TO_MONTH_LEAP = _makeDaysToMonth(new Array(366), DAYS_IN_MONTH_LEAP)
 
 const MONTH_START = prefixSums(DAYS_IN_MONTH)
 const MONTH_START_LEAP = prefixSums(DAYS_IN_MONTH_LEAP)
@@ -42,11 +42,11 @@ const MONTH_START_LEAP = prefixSums(DAYS_IN_MONTH_LEAP)
 const _cachedIsLeapYearFromYear = {}
 
 const _doCalcIsLeapYearFromYear = (year) => false
-|| year % 400 === 0
-|| (true
-	&& year % 4 === 0
-	&& year % 100 !== 0
-)
+	|| year % 400 === 0
+	|| (true
+		&& year % 4 === 0
+		&& year % 100 !== 0
+	)
 
 const calcIsLeapYearFromYear = (year) => {
 	const cached = _cachedIsLeapYearFromYear[year]
@@ -89,14 +89,13 @@ const calcDaysSinceEpoch = (timestamp) => Math.floor(timestamp / dDay)
 const calcDayOfWeekFromDaysSinceEpoch = (daysSinceEpoch) => (daysSinceEpoch + 3) % 7
 
 const calcYearFromDaysSinceEpoch = (daysSinceEpoch) => {
-	let _year = Math.floor(daysSinceEpoch / 365)
+	const _year = Math.floor(daysSinceEpoch / 365)
 	let year = 1970 + _year
 	let isLeapYear = calcIsLeapYearFromYear(year)
 	const leapYearsSinceEpoch = calcLeapYearsSinceEpochFromYear(_year, isLeapYear)
 
 	let daysSinceYear = daysSinceEpoch - (_year * 365 + leapYearsSinceEpoch)
 	if (daysSinceYear < 0) {
-		_year -= 1
 		year -= 1
 		daysSinceYear += 365
 		isLeapYear = isLeapYear ? false : calcIsLeapYearFromYear(year)
@@ -112,7 +111,8 @@ const calcMonthFromDaysSinceYear = (daysSinceYear, isLeapYear) => {
 	if (isLeapYear) {
 		daysToMonth = DAYS_TO_MONTH_LEAP
 		monthStart = MONTH_START_LEAP
-	} else {
+	}
+	else {
 		daysToMonth = DAYS_TO_MONTH
 		monthStart = MONTH_START
 	}
@@ -218,7 +218,7 @@ const fromTimestamp = (timestamp) => {
 }
 
 const toTimestamp = (date) => {
-	if (date.timestamp) { return date.timestamp }
+	if (date.timestamp != null) { return date.timestamp }
 
 	let timestamp = 0
 

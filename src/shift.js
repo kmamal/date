@@ -75,9 +75,10 @@ const shiftMonth$$$ = (date, x) => {
 	if (_month > 11) {
 		date.year += Math.floor(_month / 12)
 		_month %= 12
-	} else if (_month < 0) {
+	}
+	else if (_month < 0) {
 		date.year += Math.floor(_month / 12)
-		_month = 12 + (_month % 12)
+		_month = ((_month % 12) + 12) % 12
 	}
 	date.month = _month + 1
 	date.isLeapYear = calcIsLeapYearFromYear(date.year)
